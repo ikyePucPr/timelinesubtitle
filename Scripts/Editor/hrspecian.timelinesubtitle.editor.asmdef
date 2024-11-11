@@ -1,0 +1,16 @@
+{
+    "name": "hrspecian.timelinesubtitle.editor",
+    "rootNamespace": "hrspecian.timelinesubtitle.editor",
+    "references": [
+        "GUID:4cbe609659956574dad420a4a994e76f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
