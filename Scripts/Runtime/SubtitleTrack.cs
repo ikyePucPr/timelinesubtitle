@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -5,6 +6,8 @@ using UnityEngine.Timeline;
 
 namespace hrspecian.timelinesubtitle.runtime
 {
+    [DisplayName("Subtitle/Track")]
+    
     [TrackBindingType(typeof(TextMeshProUGUI))]
     [TrackClipType(typeof(SubtitleClip))]
     public class SubtitleTrack : TrackAsset
