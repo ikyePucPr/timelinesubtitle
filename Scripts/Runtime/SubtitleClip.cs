@@ -6,6 +6,7 @@ namespace hrspecian.timelinesubtitle.runtime
     public class SubtitleClip : PlayableAsset
     {
         public string subtitleText;
+        public TextMood textMood;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
