@@ -30,7 +30,11 @@ namespace hrspecian.timelinesubtitle.runtime
             }
 
             text.text = currentText;
-            text.color = new Color(1, 1, 1, currentAlpha);
+
+            Color color = text.color;
+            color.a = currentAlpha;
+
+            text.color = color;
         }
     }
 
