@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WTdev : MonoBehaviour
 {
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
     private const string FOLDER_PATH = "Assets/_Project/Scripts/Data/TextMoods/";
 
     public WobblyText wobblyText;
@@ -95,7 +95,7 @@ public class WTdev : MonoBehaviour
                 }
             });
     }
-#endif
+//#endif
 }
 
 [Serializable]
