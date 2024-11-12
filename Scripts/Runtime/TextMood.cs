@@ -7,7 +7,5 @@ namespace hrspecian.timelinesubtitle.runtime
     {
         public float amplitude;
         public float magnitude;
-        public float lerpTime;
-        public AnimationCurve lerpAlphaCurve;
     }
 }
