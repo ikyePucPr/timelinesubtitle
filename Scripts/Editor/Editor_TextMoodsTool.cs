@@ -11,20 +11,33 @@ namespace hrspecian.timelinesubtitle.editor
 {
     public class Editor_TextMoodsTool : EditorWindow
     {
+        [Header("Paths")]
         private const string FOLDER_PATH = "Assets/TextMoods";
         private const string EXAMPLE_PATH = "Packages/com.hrspecian.timelinesubtitle/Assets/_ExampleTool.prefab";
 
-        private TMTenums actionType;
+        [Header("Exposed Parameters")]
         private int _actionType;
-
-        private TextMood currentTextMood;
-        private TextMood tempTextMood;
-
         private string _name;
+        private TextMood currentTextMood;
         private float _amplitude;
         private float _magnitude;
 
-        /// TESTING
+        [Header("Intern Parameters")]
+        private TMTenums actionType;
+        private TextMood tempTextMood;
+        
+        private TextMeshPro _textMeshRef;
+
+        Camera _cam = null;
+        RenderTexture _rt;
+        Texture2D _tex2d;
+        Scene _scene;
+
+        //SupportedAspects _aspectChoiceIdx = SupportedAspects.Aspect16by10;
+        float _curAspect;
+        float _worldScreenHeight = 5;
+        int _renderTextureHeight = 1080;
+
         enum SupportedAspects
         {
             Aspect4by3 = 1,
@@ -32,20 +45,6 @@ namespace hrspecian.timelinesubtitle.editor
             Aspect16by10 = 3,
             Aspect16by9 = 4
         }
-
-        Camera _cam = null;
-        RenderTexture _rt;
-        Texture2D _tex2d;
-        Scene _scene;
-
-        private TextMeshPro _textMeshRef;
-
-        //SupportedAspects _aspectChoiceIdx = SupportedAspects.Aspect16by10;
-        float _curAspect;
-
-        float _worldScreenHeight = 5;
-        int _renderTextureHeight = 1080;
-
 
         [MenuItem("Tools/Timeline Subtitle/Text Mood Editor")]
         public static Editor_TextMoodsTool ShowWindow()
@@ -61,40 +60,7 @@ namespace hrspecian.timelinesubtitle.editor
             return tool;
         }
 
-        float ToFloat(SupportedAspects aspects)
-        {
-            switch (aspects)
-            {
-                case SupportedAspects.Aspect16by10:
-                    return 16 / 10f;
-                case SupportedAspects.Aspect16by9:
-                    return 16 / 9f;
-                case SupportedAspects.Aspect4by3:
-                    return 4 / 3f;
-                case SupportedAspects.Aspect5by4:
-                    return 5 / 4f;
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        void DrawRefScene()
-        {
-            _rt = new RenderTexture(Mathf.RoundToInt(_curAspect * _renderTextureHeight), _renderTextureHeight, 16);
-            _cam.targetTexture = _rt;
-            _cam.Render();
-            _tex2d = new Texture2D(_rt.width, _rt.height, TextureFormat.RGBA32, false);
-            _tex2d.Apply(true);
-            Graphics.CopyTexture(_rt, _tex2d);
-        }
-
-        Vector2 GetGUIPreviewSize()
-        {
-            Vector2 camSizeWorld = new Vector2(_worldScreenHeight * _curAspect, _worldScreenHeight);
-            float scaleFactor = EditorGUIUtility.currentViewWidth / camSizeWorld.x;
-            return new Vector2(EditorGUIUtility.currentViewWidth, scaleFactor * camSizeWorld.y);
-        }
-
+        #region Monobehaviour
         private void OnEnable()
         {
             void OpenSceneDelay()
@@ -125,34 +91,6 @@ namespace hrspecian.timelinesubtitle.editor
         private void OnDisable()
         {
             EditorSceneManager.ClosePreviewScene(_scene);
-        }
-
-        //void OnCamSettingChange()
-        //{
-        //    _curAspect = ToFloat(_aspectChoiceIdx);
-        //    _cam.aspect = _curAspect;
-        //    _cam.orthographicSize = _worldScreenHeight;
-        //    DrawRefScene();
-        //}
-
-        //class GUIControlStates
-        //{
-        //    public bool foldout = false;
-        //};
-
-        //GUIControlStates _guiStates = new GUIControlStates();
-
-        private void ShowExample()
-        {
-            DrawRefScene();
-            if (_tex2d != null)
-            {
-                Vector2 sz = GetGUIPreviewSize();
-                Rect r = EditorGUILayout.GetControlRect(false,
-                    GUILayout.Height(sz.y),
-                    GUILayout.ExpandHeight(false));
-                EditorGUI.DrawPreviewTexture(r, _tex2d);
-            }
         }
 
         private void Update()
@@ -191,6 +129,8 @@ namespace hrspecian.timelinesubtitle.editor
             }
         }
 
+        #endregion
+
         #region Tools GUI
         private void OnGUI()
         {
@@ -206,7 +146,7 @@ namespace hrspecian.timelinesubtitle.editor
             string[] temp = Enum.GetNames(typeof(TMTenums));
             for (int i = 0; i < temp.Length; i++) { temp[i] = SplitCamelCase(temp[i]); }
 
-            _actionType = EditorGUILayout.Popup("Action", _actionType, temp);
+            _actionType = EditorGUILayout.Popup("Action: ", _actionType, temp);
             actionType = (TMTenums)_actionType;
 
             GUILayout.Space(10);
@@ -219,6 +159,19 @@ namespace hrspecian.timelinesubtitle.editor
                 case TMTenums.ModifyTextMood:
                     ModifyMoodTool();
                     break;
+            }
+        }
+
+        private void ShowExample()
+        {
+            DrawRefScene();
+            if (_tex2d != null)
+            {
+                Vector2 sz = GetGUIPreviewSize();
+                Rect r = EditorGUILayout.GetControlRect(false,
+                    GUILayout.Height(sz.y),
+                    GUILayout.ExpandHeight(false));
+                EditorGUI.DrawPreviewTexture(r, _tex2d);
             }
         }
 
@@ -261,14 +214,13 @@ namespace hrspecian.timelinesubtitle.editor
                 SaveTextMoodAsset();
             }
         }
-
         #endregion
 
         #region Submodules GUI
         private void ShowValuesFields()
         {
-            _amplitude = EditorGUILayout.FloatField("Amplitude:", _amplitude);
-            _magnitude = EditorGUILayout.FloatField("Magnitude: ", _magnitude);
+            _amplitude = EditorGUILayout.Slider("Amplitude: ", _amplitude, 0f, 10f);
+            _magnitude = EditorGUILayout.Slider("Magnitude: ", _magnitude, 0f, 3f);
         }
 
         #endregion
@@ -326,6 +278,55 @@ namespace hrspecian.timelinesubtitle.editor
 
             ResetValuesFields();
         }
+
+        float ToFloat(SupportedAspects aspects)
+        {
+            switch (aspects)
+            {
+                case SupportedAspects.Aspect16by10:
+                    return 16 / 10f;
+                case SupportedAspects.Aspect16by9:
+                    return 16 / 9f;
+                case SupportedAspects.Aspect4by3:
+                    return 4 / 3f;
+                case SupportedAspects.Aspect5by4:
+                    return 5 / 4f;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        void DrawRefScene()
+        {
+            _rt = new RenderTexture(Mathf.RoundToInt(_curAspect * _renderTextureHeight), _renderTextureHeight, 16);
+            _cam.targetTexture = _rt;
+            _cam.Render();
+            _tex2d = new Texture2D(_rt.width, _rt.height, TextureFormat.RGBA32, false);
+            _tex2d.Apply(true);
+            Graphics.CopyTexture(_rt, _tex2d);
+        }
+
+        Vector2 GetGUIPreviewSize()
+        {
+            Vector2 camSizeWorld = new Vector2(_worldScreenHeight * _curAspect, _worldScreenHeight);
+            float scaleFactor = EditorGUIUtility.currentViewWidth / camSizeWorld.x;
+            return new Vector2(EditorGUIUtility.currentViewWidth, scaleFactor * camSizeWorld.y);
+        }
+
+        //void OnCamSettingChange()
+        //{
+        //    _curAspect = ToFloat(_aspectChoiceIdx);
+        //    _cam.aspect = _curAspect;
+        //    _cam.orthographicSize = _worldScreenHeight;
+        //    DrawRefScene();
+        //}
+
+        //class GUIControlStates
+        //{
+        //    public bool foldout = false;
+        //};
+
+        //GUIControlStates _guiStates = new GUIControlStates();
 
         private string SplitCamelCase(string input) =>
             System.Text.RegularExpressions.Regex.Replace(input, "([A-Z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim();
