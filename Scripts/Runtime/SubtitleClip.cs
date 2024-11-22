@@ -14,6 +14,7 @@ namespace hrspecian.timelinesubtitle.runtime
 
             SubtitleBehaviour subtitleBehaviour = playable.GetBehaviour();
             subtitleBehaviour.subtitleText = subtitleText;
+            subtitleBehaviour.textMood = textMood;
 
             return playable;
         }
