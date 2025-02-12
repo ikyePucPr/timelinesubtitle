@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.Playables;
 
-namespace hrspecian.timelinesubtitle.runtime
+namespace hrs.timelinesubtitle.runtime
 {
+    using UnityEngine;
+    using UnityEngine.Playables;
     public class SubtitleClip : PlayableAsset
     {
         public string subtitleText;
